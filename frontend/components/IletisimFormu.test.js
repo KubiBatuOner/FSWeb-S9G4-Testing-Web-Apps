@@ -19,7 +19,7 @@ test("kullanıcı adını 5 karakterden az girdiğinde BİR hata mesajı render 
   render(<IletisimFormu />);
   const ad = screen.getByPlaceholderText(/İlhan/i);
   userEvent.type(ad, "İl");
-  const errorMessage = screen.getByTestId("error");
+  const errorMessage = await screen.findByTestId("error");
   expect(errorMessage).toBeInTheDocument();
 });
 
@@ -45,7 +45,7 @@ test("kullanıcı doğru ad ve soyad girdiğinde ama email girmediğinde BİR ha
   userEvent.type(ad, "İlhan");
   userEvent.type(soyad, "Mansız");
   userEvent.click(button);
-  const errorText = screen.getByTestId("error");
+  const errorText = await screen.findByTestId("error");
   expect(errorText).toBeInTheDocument();
 });
 
@@ -53,7 +53,7 @@ test('geçersiz bir mail girildiğinde "email geçerli bir email adresi olmalıd
   render(<IletisimFormu />);
   const email = screen.getByPlaceholderText(/yüzyılıngolcüsü@hotmail.com/i);
   userEvent.type(email, "yüzyıl");
-  const errorMessage = screen.getByTestId("error");
+  const errorMessage = await screen.findByTestId("error");
   expect(errorMessage).toHaveTextContent(
     "email geçerli bir email adresi olmalıdır."
   );
@@ -78,7 +78,7 @@ test("ad,soyad, email render ediliyor. mesaj bölümü doldurulmadığında hata
   expect(soyad).toBeInTheDocument();
   expect(email).toBeInTheDocument();
   userEvent.click(button);
-  const errorTextArray = screen.getAllByTestId("error");
+  const errorTextArray = await screen.findAllByTestId("error");
   expect(errorTextArray.length).toEqual(3);
 });
 
@@ -94,16 +94,18 @@ test("form gönderildiğinde girilen tüm değerler render ediliyor.", async () 
   userEvent.type(email, "kubi@batu.com");
   userEvent.type(mesaj, "harika");
   userEvent.click(button);
-  const displayName = screen.getByTestId("firstnameDisplay");
-  const displayLastName = screen.getByTestId("lastnameDisplay");
-  const displayEmail = screen.getByTestId("emailDisplay");
-  const displayMessage = screen.getByTestId("messageDisplay");
-  expect(displayName).toBeInTheDocument();
-  expect(displayLastName).toBeInTheDocument();
-  expect(displayEmail).toBeInTheDocument();
-  expect(displayMessage).toBeInTheDocument();
-  expect(displayName).toHaveTextContent("kubilay");
-  expect(displayLastName).toHaveTextContent("öner");
-  expect(displayEmail).toHaveTextContent("kubi@batu.com");
-  expect(displayMessage).toHaveTextContent("harika");
+  await waitFor(() => {
+    const displayName = screen.getByTestId("firstnameDisplay");
+    const displayLastName = screen.getByTestId("lastnameDisplay");
+    const displayEmail = screen.getByTestId("emailDisplay");
+    const displayMessage = screen.getByTestId("messageDisplay");
+    expect(displayName).toBeInTheDocument();
+    expect(displayLastName).toBeInTheDocument();
+    expect(displayEmail).toBeInTheDocument();
+    expect(displayMessage).toBeInTheDocument();
+    expect(displayName).toHaveTextContent("kubilay");
+    expect(displayLastName).toHaveTextContent("öner");
+    expect(displayEmail).toHaveTextContent("kubi@batu.com");
+    expect(displayMessage).toHaveTextContent("harika");
+  });
 });
